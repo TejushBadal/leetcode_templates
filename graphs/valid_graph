@@ -1,0 +1,58 @@
+# ## Graph Valid Tree (LC 261) - MEDIUM
+# **Date Solved:** Nov 4, 2024 (Day 8)
+# **Time Taken:** ~30 min (with guidance on undirected cycle logic)
+# **Pattern:** Undirected Cycle Detection + Connectivity Check
+
+# ### Approach:
+# 1. Quick check: n nodes must have n-1 edges (tree property)
+# 2. Build bidirectional adjacency list (undirected graph)
+# 3. DFS from node 0 with parent tracking
+# 4. Cycle detection: visited neighbor that's NOT parent = cycle
+# 5. After DFS: check all nodes visited (connectivity)
+
+# ### Time Complexity: O(V + E) = O(n) since E = n-1
+# - Visit each node once: O(n)
+# - Check each edge twice (bidirectional): O(2E) = O(n)
+
+# ### Space Complexity: O(n)
+# - Adjacency list: O(n)
+# - Visited set: O(n)
+# - Recursion stack: O(n) worst case (skewed tree)
+
+### Key Pattern - DFS with Parent Tracking:
+def validTree(self, n: int, edges: List[List[int]]) -> bool:
+        #edge case
+        if n-1 != len(edges):
+            return False
+        
+        #first we build edge list, UNDIRECTED
+        graph = {i:[] for i in range(n)}
+
+        for node, edge in edges:
+            graph[node].append(edge)
+            graph[edge].append(node)
+        
+        #we must check connectivity and cycles
+        #dfs with cycle detection pattern dfs(node, parent)
+        #DFS WILL RETURN TRUE IF CYCLE FOUND
+
+        visited = set()
+        def has_cycle(node, parent):
+            visited.add(node)
+
+            for neighbor in graph[node]:
+                if neighbor == parent:
+                    continue
+                if neighbor in visited:
+                    return True #CYCLE FOUND
+                
+                if has_cycle(neighbor, node):
+                    return True
+                
+            return False #NO CYCLE FOUND
+
+        #call once, if length(visited) is not n its false
+
+        has_cycle(0, None)
+
+        return len(visited) == n
